@@ -46,6 +46,19 @@ func main() {
 		return c.JSON(200, products)
 	})
 
+	e.GET("/products/:id", func (c *echo.Context) error  {
+		id := c.Param("id")
+
+		products, err := config.GetProductByID(db, id)
+		if err != nil {
+			return c.JSON(http.StatusNotFound, map[string]string {
+				"message": "product not found",
+			})
+		}
+
+		return c.JSON(http.StatusOK, products)
+	})
+
 	e.GET("/categories", func(c *echo.Context) error {
 		categories, err := config.GetCategories(db)
 		if err != nil {

@@ -33,7 +33,7 @@ func ConnectDB() (*sql.DB, error) {
 }
 
 func GetProducts(db *sql.DB) ([]models.Product, error) {
-	query := "SELECT id, name, price, ratings, image_url, is_available, total_sold FROM products"
+	query := "SELECT id, name, description, price, ratings, image_url, stock, is_available, total_sold FROM products"
 
 	rows, err := db.Query(query)
 	if err != nil {
@@ -49,9 +49,11 @@ func GetProducts(db *sql.DB) ([]models.Product, error) {
 		err := rows.Scan(
 			&product.ID,
 			&product.Name,
+			&product.Description,
 			&product.Price,
 			&product.Ratings,
 			&product.ImageURL,
+			&product.Stock,
 			&product.IsAvailable,
 			&product.TotalSold,
 		)
@@ -108,4 +110,28 @@ func GetCategories(db *sql.DB) ([]models.Category, error) {
 	}
 
 	return categories, nil
+}
+
+func GetProductByID(db *sql.DB, id string) (*models.Product, error) {
+	query := "SELECT id, name, description, price, ratings, image_url, stock, is_available, total_sold FROM products WHERE id = $1"
+
+	var product models.Product
+
+	err := db.QueryRow(query, id).Scan(
+		&product.ID,
+		&product.Name,
+		&product.Description,
+		&product.Price,
+		&product.Ratings,
+		&product.ImageURL,
+		&product.Stock,
+		&product.IsAvailable,
+		&product.TotalSold,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &product, nil
 }
